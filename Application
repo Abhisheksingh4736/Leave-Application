@@ -1,0 +1,821 @@
+// Leave Applicationt List
+
+@include('theme_layout/header')
+@include('theme_layout/nav')
+
+<div class="app-main__outer">
+ <div class="app-main__inner"> 
+ <div class="app-page-title">
+   <div class="page-title-wrapper">
+	<div class="page-title-heading">
+	   
+	 <div>     
+   Leave Applicationt List
+	 </div>
+	</div>      <!--page-title-heading-->
+                            
+	<div class="page-title-actions">
+	 <div class="d-inline-block dropdown">
+	 
+	  <a  class="mt-3 btn btn-primary btn-lg text-white" href="{{route('leave_application_self_add')}}"> 
+	  <i  class="fa fa-plus fa-w-20 text-right">
+	  </i> Add Leave Request </a>
+	  
+	 </div>      <!--d-inline-block dropdown-->
+	</div>      <!--page-title-actions-->
+   </div>      <!--page-title-wrapper-->
+  </div> 
+  		
+  <div class="main-card mb-3 card">
+  
+   <div class="card-body">
+     @if(Session::has('successMessage'))
+	     <input id="toster_id" type="hidden" value="{{ Session::get('successMessage') }}">
+		 @elseif(Session::has('alertMessage'))
+			<input id="toster_id" type="hidden" value="{{ Session::get('alertMessage') }}">	
+		  @endif 
+	    
+	<div class="form-row"> 
+
+  <div class="col-md-4  date position-relative form-group" id="myDatepicker4">
+	 
+	  <label for="select_warehouse" class="font-weight-bold"> Start Date</label>
+	  <input type="date" class="form-control fromdates" name="fromdate" id="fromdate" value="<?php if(isset($_GET['fromdate'])) echo $_GET['fromdate']; else echo date("Y-m-d"); ?>" autocomplete="off">
+	  
+	 </div>        <!--col-md-6  date position-relative form-group-->
+	 
+	 <div class="col-md-4  date position-relative form-group" id="myDatepicker5">
+	 
+      <label for="select_warehouse" class="font-weight-bold "> End Date</label>
+	  <input type="date" class="form-control todates" name="todate"  id="todate"  value="<?php if(isset($_GET['todate'])) echo $_GET['todate']; else echo date("Y-m-d"); ?>" autocomplete="off">
+	  
+	 </div> 
+  <div class="col-md-4  date position-relative form-group" id="myDatepicker5">
+	 
+   <label for="select_warehouse" class="font-weight-bold ">Leave Type</label>
+ <!-- <input type="text" class="form-control todates" name="todate"  id="todate"  autocomplete="off"> -->
+ <select name="leave_type" id="leave_type" class="form-control">
+  <option></option>
+  @foreach($leave_type as $leave_types)
+  <option value="{{$leave_types->id}}">{{$leave_types->Leave_Code}}-{{$leave_types->Leave_Type}}</option>
+  @endforeach
+ </select>
+ 
+</div>
+<div class="col-md-4 date position-relative form-group" id="myDatepicker5">
+	 
+   <label for="select_warehouse" class="font-weight-bold ">Employee</label>
+ <!-- <input type="text" class="form-control todates" name="todate"  id="todate"  autocomplete="off"> -->
+ <select name="hr_employees" id="hr_employees" class="form-control">
+  <option></option>
+  @foreach($hr_employees as $hr_employeess)
+  <option value="{{$hr_employeess->id}}">{{$hr_employeess->emp_code}}-{{$hr_employeess->emp_name}}</option>
+  @endforeach
+ </select>
+ 
+</div>
+	 
+         <!--col-md-6  date position-relative form-group-->
+	</div>        <!--form-row-->
+	 <div class="form-row">
+	     <div class="col-md-12 text-center">
+		  <button id="submit" class="btn btn-primary mr-2 mb-2 block-element-btn-example">
+                                                    Filter</button> 
+		 <div id="filter_loder" style="display:none;width:70px;height:80px;border:0px solid black;position:absolute;top:40%;left:40%;padding:3px;"><img src='https://www.w3schools.com/jquery/demo_wait.gif' width="64" height="64" />
+		 </div>  
+		 </div>  
+	    </div>
+ <!--	<div class="form-row">
+	 <div class="col-md-12 text-center"> 
+	 
+	  <button id="submit" class="mt-3 btn btn-primary btn-lg">Search</button>
+		
+	 </div>	       
+	</div>		      -->							 
+    
+  <br> 
+<div class="overflow-visible overflow-x-auto">
+
+		<table class="table table-bordered data-table">
+				<thead>
+					<tr>
+						<th style="min-width:100px;">Request Number</th>
+						<th style="min-width:100px;">Request Date</th>
+						<th style="min-width:100px;">Leave Type</th>
+						<th style="min-width:100px;">Leave Days</th>
+						<th style="min-width:85px;">Employee Name</th>
+						<th style="min-width:85px;">Start Date</th>
+						<!-- <th style="min-width:85px;">Position</th> -->
+						<th style="min-width:130px;">End Date </th>
+						<th style="min-width:40px;">Action</th>
+					</tr>
+				 </thead>
+				 <tbody>
+				</tbody>
+           </table>
+</div>
+		<br>
+	</div>       <!--card-body-->
+	
+   </div>        <!--main-card mb-3 card-->
+  
+  </div>       <!--app-main__inner-->
+  
+@include('theme_layout/footer')	
+</div>    <!--app-main__outer-->
+  <style>
+	@media only screen and (max-width:480px) {
+
+.overflow-x-auto
+{
+  overflow: scroll;
+}
+.data-table
+
+{
+width: 100% !important;
+}
+}
+	 .align_right{
+		text-align: right  !important; 
+	 }
+	 .align_left{
+		text-align: left  !important; 
+	 }
+	 
+	 </style>
+   
+
+   <script type="text/javascript">
+  $(function () {
+
+	$.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    })
+
+
+	const table = $('.data-table').DataTable({
+		processing: true,
+        serverSide: true,
+        ajax:{
+            url:"{{ URL('leave_application_list_ajax/') }}",
+            type: 'GET',
+
+            data: function (d){
+				     d.fromdates = jq('#fromdate').val(),
+				     d.todates = jq('#todate').val(),
+				     d.leave_type = jq('#leave_type').val(),
+				     d.hr_employees = jq('#hr_employees').val()
+             
+                  } 
+        },
+		"order": [0, 'desc'],
+	 columns: [
+            {data: 'application_code', name: 'application_code', "class" : "align_left"},
+            {data: 'application_date', name: 'application_date', "class" : "align_left"},
+            {data: 'Leave_Type', name: 'Leave_Type', "class" : "align_left"},
+           {data: 'leave_days', name: 'leave_days', "class" : "align_left"},
+            {data: 'employee_name', name: 'employee_name', "class" : "align_left"},
+            {data: 'start_date', name: 'start_date', "class" : "align_left"},
+            {data: 'end_date', name: 'end_date', "class" : "align_left"},
+            // {data: 'Position', name: 'Position', "class" : "align_left"},
+           
+			{
+                data: 'action',
+                name: 'action',
+                orderable: true,
+                searchable: true
+            },
+			
+			    
+		 ]
+    });
+
+	
+	$("#submit").on('click', function () {
+	 table.draw(); 
+    });
+
+   // var fromdate = jq('#fromdate').val();
+  // var todate = jq('#todate').val();
+	 
+    
+  });
+
+  
+</script>
+
+
+ 
+    <style>
+	 .addbtn{
+		 margin-right: 14% !important; 
+	 }
+	 </style>
+ 
+<script>
+
+
+   var jq = $.noConflict();
+   jq(document).ready(function(){
+	 @if(Session::has('successMessage'))
+	   var toster=jq('#toster_id').val();
+       if(toster!=''){
+			Swal.fire({
+				   
+				  icon: 'success',
+				  title: ''+toster,
+				  showConfirmButton: false,
+				  timer: 2000
+				})
+	      }
+		  
+		  {{ Session::forget('successMessage') }}
+		  
+		  @elseif(Session::has('alertMessage'))
+			var toster=jq('#toster_id').val();
+			if(toster != ''){
+			Swal.fire({
+			 
+			icon: 'warning',
+			title: ''+toster,
+			showConfirmButton: false,
+			timer: 4000
+			})
+			}
+			{{ Session::forget('alertMessage') }}
+
+		@endif
+
+	$('#leave_type').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true}); 
+	$('#hr_employees').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true}); 
+  
+});
+
+
+</script> 	
+    	
+
+// Leave Application View Button
+
+
+@include('theme_layout/header')
+@include('theme_layout/nav')
+
+@php
+    $row1 = date("d-m-Y", strtotime($get_data->application_date));
+
+@endphp
+
+<div class="app-main__outer"> 
+ <div class="app-main__inner">
+  <div class="app-page-title">
+   <div class="page-title-wrapper">
+	<div class="page-title-heading">
+	 
+	 <div>  
+			{{ request()->route('id') ? 'Edit ' : 'Add ' }} 
+			Leave Application
+	 </div>
+	</div>      <!--page-title-heading-->
+                                  
+	<div class="page-title-actions">
+	 <div class="d-inline-block dropdown">
+	 
+     <a href="{{route('leave_application_list')}}" class="mt-3 btn btn-primary btn-lg text-white">
+		  <i class="fa fa-arrow-left fa-w-20"></i> Back</a>
+	  
+	 </div>      <!--d-inline-block dropdown-->
+	</div>      <!--page-title-actions-->
+   </div>      <!--page-title-wrapper-->
+  </div>         <!--app-page-title-->         
+					 
+  <div class="tab-content">
+   <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
+	<div class="main-card mb-3 card">
+	 <div class="card-body"><h5 class="card-title"></h5> 
+	 
+	 <form id="form" class="" onsubmit="return checkForm(this);" action="{{ route('leave_application_store') }}" method="post">
+			{{ csrf_field() }}
+
+  
+        <div class="form-row">    
+            <div class="col-md-4">
+                <div class="position-relative form-group">
+                <label for="" class="ml-2 font-weight-bold"> Application Code<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>
+
+                
+                <input name="application_code" id="application_code"  type="text"  class="form-control"  value="{{$get_data->application_code}}" disabled="true" required readonly>
+                </div>
+            </div>
+
+                     <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="application_date" class="">Application Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="application_date"  value="{{$get_data->application_date}}" name="application_date" class="form-control" readonly>		  
+               </div>     
+               </div>
+               <input autocomplete="off" type="hidden" id="updated_id"  value="{{$get_data->id}}" name="updated_id" class="form-control"  >
+
+                      <div class="col-md-4">
+                          <div class="position-relative form-group">
+                                   <label for="leave_type" class="ml-2 font-weight-bold">Leave Type<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px;" ></i> </label>
+                                   <select class="mb-2 form-control outlet" name="leave_type" id="leave_type" disabled required>  
+                                    <option value="">Select Leave Type</option>
+                                    @foreach($leave_type as $data) 
+                                    <option value="{{$data->id}}" {{$get_data->leave_type == $data->id ? 'selected' : '' }}>{{$data->Leave_Code}} - {{$data->Leave_Type}}</option>
+                                       @endforeach
+                                 </select> 
+                           </div>
+                        </div>
+
+            
+                            <div class="col-md-4">
+                              <div class="position-relative form-group">
+                                <label for="employee_id" class="ml-2 font-weight-bold">Employee Id<i class="fa fa-asterisk" style="color:red; font-size: 8px;  font-weight:bold;position: absolute; top:3px; margin-left: 3px;"></i></label>
+                                <select name="employee_id" id="employee_id" class="form-control" required disabled>
+                              <option value="">Select Employee</option>
+                              @foreach($Hr_employees as $datas) 
+                                 <option value="{{ $datas->id}}" {{$get_data->employee_id == $datas->id ? 'selected' : '' }}>{{$datas->emp_id}} </option>
+                              @endforeach
+                           </select>
+
+                          </div>
+                      </div>
+
+            <div class="col-md-4">
+		<div class="position-relative form-group">
+		    <label  class="font-weight-bold" >Employee Name</label>
+		    <input type="text" name="employee_name" id="employee_name" class="form-control" required readonly>
+		</div>     <!--position-relative form-group--> 
+	   </div> 
+	   
+	   <div class="col-md-4">
+		<div class="position-relative form-group">
+		    <label  class="font-weight-bold" >Position </label>
+		    <input type="text" name="position" id="position" class="form-control" required readonly>
+		</div>     <!--position-relative form-group--> 
+	   </div> 
+            
+            <div class="col-md-4">
+                <div class="position-relative form-group">
+                <label for="asset_c" class="ml-2 font-weight-bold">Balance Leave<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>
+                <input name="balance_leave" id="type" placeholder=""   maxlength="50" class="form-control" value="{{$employee->leave_quata}}" autocomplete="off" required readonly>
+                  </div>
+            </div>
+
+            
+            <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="start_date" class="">Start Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="start_date" value="{{$get_data->start_date}}" name="start_date" class="form-control" readonly >		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="end_date" class="">End Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="end_date" value="{{$get_data->end_date}}"  name="end_date" class="form-control" readonly>		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="leave_days" class="">Leave Days<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="days" id="leave_days" value="{{$get_data->leave_days}}" name="leave_days" class="form-control" readonly >		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="created_by" class="">Created By<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="text" id="created_by" value="{{$get_data->created_by}}" name="created_by" class="form-control" readonly>		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="authorised_by" class="">Authorised By<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="text" id="authorised_by" value="{{$get_data->authorised_by}}" name="authorised_by" class="form-control" readonly>		  
+               </div>     
+               </div>
+
+            <div class="col-md-12">
+		        <div class="position-relative form-group">
+            <label class="font-weight-bold mb-2"  for="comment" class="">Remark<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>  <input  maxlength="50" name="remark" id="comment" value="{{$get_data->remark}}"  type="text" class="form-control" value=""  autocomplete="off" required readonly>
+		      
+
+	    </div>       <!--position-relative form-group-->
+	   </div>      
+      </div>  
+
+        </div><!--form-row-->
+        </div>  
+        </div> 
+	  
+	 </form>
+	   
+	 </div>      <!--card-body-->
+    </div>      <!--main-card mb-3 card-->
+   </div>      <!--tab-pane tabs-animation fade show active-->
+  </div>      <!--tab-content-->
+ </div>      <!--app-main__inner-->
+ @include('theme_layout/footer')
+ 
+ <script>
+ 
+ var jq = $.noConflict();
+ 
+ jq(document).ready(function(){
+    
+    jq("#back").click(function(){
+       window.history.back();
+    });
+
+  $('#employee_id').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true});
+  $('#leave_type').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true});
+  var employee=$('#employee_id').val();
+		 get_employee_name(employee);
+       function get_employee_name(employee)
+	 {
+         jq.ajax({
+			url:"{{URL('/get_employee_data_name')}}"+"/"+employee,
+            type:"GET",
+			success:function(response)
+			 {
+			    $('#employee_name').val(response.employee_name);
+			    $('#position').val(response.designation_name);
+			 }
+		 })
+	 }
+  $('#employee_id').change(function(){
+         var employee=$('#employee_id').val();
+		 get_employee_name(employee);
+       function get_employee_name(employee)
+	 {
+         jq.ajax({
+			url:"{{URL('/get_employee_data_name')}}"+"/"+employee,
+            type:"GET",
+			success:function(response)
+			 {
+			    $('#employee_name').val(response.employee_name);
+			    $('#position').val(response.designation_name);
+			 }
+		 })
+	 }
+	});
+
+});
+       
+</script>	
+       
+
+//
+
+
+@include('theme_layout/header')
+@include('theme_layout/nav')
+
+<div class="app-main__outer"> 
+ <div class="app-main__inner">
+  <div class="app-page-title">
+   <div class="page-title-wrapper">
+	<div class="page-title-heading">
+	 
+	 <div>  
+			{{ request()->route('id') ? 'Edit ' : 'Add ' }} 
+			Leave Application
+	 </div>
+	</div>      <!--page-title-heading-->
+                                  
+	<div class="page-title-actions">
+	 <div class="d-inline-block dropdown">
+	 
+     <a href="{{route('leave_application_list')}}" class="mt-3 btn btn-primary btn-lg text-white">
+		  <i class="fa fa-arrow-left fa-w-20"></i> Back</a>
+	  
+	 </div>      <!--d-inline-block dropdown-->
+	</div>      <!--page-title-actions-->
+   </div>      <!--page-title-wrapper-->
+  </div>         <!--app-page-title-->         
+					 
+  <div class="tab-content">
+   <div class="tab-pane tabs-animation fade show active" id="tab-content-0" role="tabpanel">
+	<div class="main-card mb-3 card">
+	 <div class="card-body"><h5 class="card-title"></h5> 
+	 
+	 <form id="form" class="" onsubmit="return checkForm(this);" action="{{ route('leave_application_store') }}" method="post">
+			{{ csrf_field() }}
+
+  
+        <div class="form-row">    
+            <div class="col-md-4">
+                <div class="position-relative form-group">
+                <label for="" class="ml-2 font-weight-bold"> Application Code<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>
+
+                
+                <input name="application_code" id="application_code"  type="text"  class="form-control"  value="{{$get_data->application_code}}" disabled="true" required>
+                </div>
+            </div>
+
+                     <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="application_date" class="">Application Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="application_date"  value="{{$get_data->application_date}}" name="application_date" class="form-control" >		  
+               </div>     
+               </div>
+               <input autocomplete="off" type="hidden" id="updated_id"  value="{{$get_data->id}}" name="updated_id" class="form-control" >
+                      <div class="col-md-4">
+                          <div class="position-relative form-group">
+                                   <label for="leave_type" class="ml-2 font-weight-bold">Annual Leave (AL)<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px;"></i> </label>
+                                   <select class="mb-2 form-control outlet" name="leave_type" id="leave_type" required >  
+                                    <option value="">Select Leave Type</option>
+                                    @foreach($leave_type as $data) 
+                                    <option value="{{$data->id}}" {{$get_data->leave_type == $data->id ? 'selected' : '' }}>{{$data->Leave_Code}} - {{$data->Leave_Type}}</option>
+                                       @endforeach
+                                 </select> 
+                           </div>
+                        </div>
+
+            
+            <div class="col-md-4">
+                              <div class="position-relative form-group">
+                                <label for="employee_id" class="ml-2 font-weight-bold">Employee Id<i class="fa fa-asterisk" style="color:red; font-size: 8px;  font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>
+                                <select name="employee_id" id="employee_id" class="form-control" required>
+                     <option value="">Select Employee</option>
+                     @foreach($Hr_employees as $datas) 
+                        <option value="{{ $datas->id}}" {{$get_data->employee_id == $datas->id ? 'selected' : '' }}>{{$datas->emp_id}} </option>
+                     @endforeach
+                  </select>
+
+                          </div>
+                      </div>
+
+            <div class="col-md-4">
+		<div class="position-relative form-group">
+		    <label  class="font-weight-bold" >Employee Name</label>
+		    <input type="text" name="employee_name" id="employee_name" class="form-control" required readonly>
+		</div>     <!--position-relative form-group--> 
+	   </div> 
+	   
+	   <div class="col-md-4">
+		<div class="position-relative form-group">
+		    <label  class="font-weight-bold" >Position </label>
+		    <input type="text" name="position" id="position" class="form-control" required readonly>
+		</div>     <!--position-relative form-group--> 
+	   </div> 
+            
+            <div class="col-md-4">
+                <div class="position-relative form-group">
+                <label for="asset_c" class="ml-2 font-weight-bold">Balance Leave</label>
+                <input name="balance_leave" id="type_bal" placeholder=""   maxlength="50" class="form-control" value="" autocomplete="off"  readonly>
+                  </div>
+            </div>
+
+            
+            <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="start_date" class="">Start Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="start_date" value="{{$get_data->start_date}}" name="start_date" class="form-control" >		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="end_date" class="">End Date<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>		  
+                  <input autocomplete="off" type="date" id="end_date" value="{{$get_data->end_date}}"  name="end_date" class="form-control" >		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="leave_days" class="">Leave Days</label>		  
+                  <input autocomplete="off" type="days" id="leave_days" value="{{$get_data->leave_days}}" name="leave_days" class="form-control" readonly  >		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="created_by" class="">Created By</label>		  
+                  <input autocomplete="off" type="text" id="created_by" value="{{$get_data->created_by}}" name="created_by" class="form-control" readonly>		  
+               </div>     
+               </div>
+
+               <div class="col-md-4">
+               <div class="position-relative form-group">
+                  <label  class="font-weight-bold" for="authorised_by" class="">Authorised By</label>		  
+                  <input autocomplete="off" type="text" id="authorised_by" value="{{$get_data->authorised_by}}" name="authorised_by" class="form-control" readonly>		  
+               </div>     
+               </div>
+
+            <div class="col-md-12">
+		        <div class="position-relative form-group">
+            <label class="font-weight-bold mb-2"  for="comment" class="">Remark<i class="fa fa-asterisk" style="color:red; font-size: 8px; font-weight:bold;position: absolute; top:3px; margin-left: 3px; "></i></label>  <input  maxlength="50" name="remark" id="comment" value="{{$get_data->remark}}"  type="text" class="form-control" value=""  autocomplete="off" required>
+		      
+
+	    </div>       <!--position-relative form-group-->
+	   </div>      
+      </div>  
+         <div class="full-width-box text-center">
+		@if(request()->route('id'))
+    <button id="submit" name="btnsubmit" class="mt-3 btn btn-primary btn-lg">Update</button> 
+		@else
+		<button id="submit" name="btnsubmit" class="mt-3 btn btn-primary btn-lg">Save</button>
+		@endif
+		<a href="{{route('leave_application_list')}}" class="mt-3 btn btn-secondary ml-2  btn-lg">Cancel</a>  
+		
+	    </div>   
+
+        </div><!--form-row-->
+        </div>  
+        </div> 
+	  
+	 </form>
+	   
+	 </div>      <!--card-body-->
+    </div>      <!--main-card mb-3 card-->
+   </div>      <!--tab-pane tabs-animation fade show active-->
+  </div>      <!--tab-content-->
+ </div>      <!--app-main__inner-->
+ @include('theme_layout/footer')
+ 
+ <script>
+ 
+ var jq = $.noConflict();
+ 
+ jq(document).ready(function(){
+    
+    jq("#back").click(function(){
+       window.history.back();
+    });
+
+  $('#employee_id').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true});
+  $('#leave_type').SumoSelect({ selectAll:true,search: true,triggerChangeCombined : true});
+  var employee=$('#employee_id').val();
+		 get_employee_name(employee);
+       function get_employee_name(employee)
+	 {
+         jq.ajax({
+			url:"{{URL('/get_employee_data_name')}}"+"/"+employee,
+            type:"GET",
+			success:function(response)
+			 {
+            
+			    $('#employee_name').val(response.employee_name);
+			    $('#position').val(response.designation_name);
+			    $('#created_by').val(response.company_name);
+			 }
+          
+		 })
+	 }
+  $('#employee_id').change(function(){
+         var employee=$('#employee_id').val();
+		 get_employee_name(employee);
+       function get_employee_name(employee)
+	 {
+         jq.ajax({
+			url:"{{URL('/get_employee_data_name')}}"+"/"+employee,
+            type:"GET",
+			success:function(response)
+			 {
+			    $('#employee_name').val(response.employee_name);
+			    $('#position').val(response.designation_name);
+			 }
+		 })
+	 }
+	});
+   //
+
+   
+   //
+  
+
+   var employee=$('#employee_id').val();
+   var leave_quata=$('#leave_type').val();
+  
+   get_employee_name_bal(employee,leave_quata);
+   function get_employee_name_bal(employee,leave_quata)
+  {
+      jq.ajax({
+      url:"{{URL('/get_employee_name_bal')}}"+"/"+employee+"/"+leave_quata,
+      type:"GET",
+      success:function(response)
+
+    {
+      if(response.leave_quata ==0)
+      {
+        
+         $('#type_bal').val('0');
+         $('#submit').prop('disabled', true);
+      }
+      else
+      {
+         $('#type_bal').val(response.leave_quata);
+
+         $('#type_bal').val(response.leave_quata);
+
+
+         $('#submit').prop('disabled', false);
+       
+
+      }
+    }
+ })
+}
+   
+   //
+
+   $('#employee_id').change(function(){
+
+      var employee=$('#employee_id').val();
+      var leave_quata=$('#leave_type').val();
+     
+      get_employee_name_bal(employee,leave_quata);
+      function get_employee_name_bal(employee,leave_quata)
+     {
+         jq.ajax({
+         url:"{{URL('/get_employee_name_bal')}}"+"/"+employee+"/"+leave_quata,
+         type:"GET",
+         success:function(response)
+
+       {
+         if(response.leave_quata)
+         {
+            $('#type_bal').val(response.leave_quata);
+
+            
+            $('#submit').prop('disabled', false);
+
+         }
+         else
+         {
+            $('#type_bal').val('0');
+            $('#submit').prop('disabled', true);
+
+         }
+       }
+    })
+ }
+});
+  
+$('#submit').prop('disabled', true);
+//
+
+$(document).ready(function () {
+   $('#employee_id').on('click', function () {
+      
+       var previous_column = $('#leave_type').val();  
+       if (!previous_column) {
+           Swal.fire({
+               icon: 'error',
+               title: 'Please selected Leave Type' + previous_column,
+               showCancelButton: false,
+               confirmButtonText: 'Ok'
+           });
+       } 
+   });
+});
+
+//
+
+$(document).ready(function () {
+      $('#end_date').change(function(){
+       var startDate = $('#start_date').val();  
+       if (!startDate) {
+           Swal.fire({
+               icon: 'error',
+               title: 'Please select a Start Date',
+               showCancelButton: false,
+               confirmButtonText: 'Ok'
+           });
+           return; 
+       } 
+       var endDate = $('#end_date').val();
+      
+       var startDateObj = new Date(startDate);
+       var endDateObj = new Date(endDate);
+       if (endDateObj <= startDateObj) {
+           Swal.fire({
+               icon: 'error',
+               title: 'End Date must be later than Start Date',
+               showCancelButton: false,
+               confirmButtonText: 'Ok'
+           });
+           return; 
+       }
+       var differenceInMilliseconds = endDateObj - startDateObj;
+       var differenceInDays = Math.ceil(differenceInMilliseconds / (1000 * 60 * 60 * 24)) + 1;
+
+       $('#leave_days').val(differenceInDays);
+     
+   });
+});
+
+//
+
+});
+       
+</script>	
+       
